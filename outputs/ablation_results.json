@@ -1,0 +1,488 @@
+{
+  "ablation_results": [
+    {
+      "name": "Baseline CNN",
+      "params": 227884,
+      "tr_acc": 93.3,
+      "va_acc": 91.96,
+      "te_acc": 92.47,
+      "te_f1": 0.8882,
+      "best_va_epoch": 9,
+      "best_va_acc": 91.96
+    },
+    {
+      "name": "CNN + Dropout",
+      "params": 227884,
+      "tr_acc": 86.03,
+      "va_acc": 86.05,
+      "te_acc": 86.73,
+      "te_f1": 0.7969,
+      "best_va_epoch": 10,
+      "best_va_acc": 86.05
+    },
+    {
+      "name": "CNN + Augmentation",
+      "params": 227884,
+      "tr_acc": 82.22,
+      "va_acc": 82.76,
+      "te_acc": 83.62,
+      "te_f1": 0.7618,
+      "best_va_epoch": 10,
+      "best_va_acc": 82.76
+    },
+    {
+      "name": "CNN + Aug + Drop",
+      "params": 227884,
+      "tr_acc": 74.96,
+      "va_acc": 78.21,
+      "te_acc": 79.06,
+      "te_f1": 0.6869,
+      "best_va_epoch": 8,
+      "best_va_acc": 78.21
+    },
+    {
+      "name": "Deeper CNN (Final)",
+      "params": 981932,
+      "tr_acc": 85.53,
+      "va_acc": 86.05,
+      "te_acc": 86.85,
+      "te_f1": 0.7997,
+      "best_va_epoch": 10,
+      "best_va_acc": 86.05
+    }
+  ],
+  "histories": {
+    "Baseline CNN": {
+      "train_loss": [
+        1.3066,
+        0.8426,
+        0.7433,
+        0.6812,
+        0.6398,
+        0.6023,
+        0.5725,
+        0.5573,
+        0.5345,
+        0.5281
+      ],
+      "val_loss": [
+        0.9316,
+        0.9318,
+        0.724,
+        0.6679,
+        0.6433,
+        0.6233,
+        0.5803,
+        0.5829,
+        0.557,
+        0.5477
+      ],
+      "train_acc": [
+        61.35,
+        78.36,
+        81.7,
+        84.85,
+        87.21,
+        88.68,
+        90.5,
+        91.06,
+        92.26,
+        92.77
+      ],
+      "val_acc": [
+        74.92,
+        74.06,
+        84.02,
+        84.98,
+        88.17,
+        88.07,
+        89.99,
+        90.75,
+        91.96,
+        91.76
+      ]
+    },
+    "CNN + Dropout": {
+      "train_loss": [
+        1.5885,
+        1.1344,
+        0.98,
+        0.8975,
+        0.8558,
+        0.8139,
+        0.7962,
+        0.7716,
+        0.7657,
+        0.7486
+      ],
+      "val_loss": [
+        1.1375,
+        0.9043,
+        0.8035,
+        0.7613,
+        0.7283,
+        0.6909,
+        0.6791,
+        0.6632,
+        0.6583,
+        0.6531
+      ],
+      "train_acc": [
+        47.61,
+        66.47,
+        71.76,
+        74.53,
+        76.81,
+        78.79,
+        79.1,
+        80.62,
+        80.74,
+        82.05
+      ],
+      "val_acc": [
+        66.13,
+        75.08,
+        79.12,
+        79.78,
+        82.81,
+        83.82,
+        84.83,
+        85.74,
+        85.79,
+        86.05
+      ]
+    },
+    "CNN + Augmentation": {
+      "train_loss": [
+        1.7107,
+        1.3302,
+        1.1851,
+        1.0859,
+        1.0295,
+        0.9779,
+        0.9387,
+        0.9021,
+        0.8884,
+        0.8772
+      ],
+      "val_loss": [
+        1.2969,
+        1.1797,
+        1.0165,
+        0.9321,
+        0.8701,
+        0.8512,
+        0.8097,
+        0.8187,
+        0.7824,
+        0.7672
+      ],
+      "train_acc": [
+        42.45,
+        57.12,
+        64.14,
+        67.86,
+        70.24,
+        72.85,
+        74.39,
+        76.63,
+        76.71,
+        78.1
+      ],
+      "val_acc": [
+        55.36,
+        63.8,
+        72.35,
+        73.76,
+        77.4,
+        77.65,
+        80.84,
+        81.24,
+        81.8,
+        82.76
+      ]
+    },
+    "CNN + Aug + Drop": {
+      "train_loss": [
+        1.9511,
+        1.6246,
+        1.4819,
+        1.3821,
+        1.3046,
+        1.2448,
+        1.2082,
+        1.1851,
+        1.1647,
+        1.1655
+      ],
+      "val_loss": [
+        1.5537,
+        1.2578,
+        1.1849,
+        1.0241,
+        0.999,
+        0.9486,
+        0.9258,
+        0.9077,
+        0.9019,
+        0.8946
+      ],
+      "train_acc": [
+        31.34,
+        44.22,
+        49.85,
+        55.28,
+        58.47,
+        60.64,
+        62.7,
+        62.78,
+        64.36,
+        64.27
+      ],
+      "val_acc": [
+        46.26,
+        62.84,
+        65.67,
+        74.97,
+        73.36,
+        76.24,
+        75.78,
+        78.21,
+        77.7,
+        77.81
+      ]
+    },
+    "Deeper CNN (Final)": {
+      "train_loss": [
+        1.6401,
+        1.2158,
+        1.0889,
+        1.0297,
+        0.978,
+        0.9294,
+        0.8865,
+        0.8642,
+        0.8463,
+        0.8426
+      ],
+      "val_loss": [
+        1.0729,
+        0.9591,
+        0.8593,
+        0.7933,
+        0.7791,
+        0.7379,
+        0.6909,
+        0.696,
+        0.6706,
+        0.6631
+      ],
+      "train_acc": [
+        43.77,
+        60.52,
+        66.35,
+        69.22,
+        71.76,
+        73.7,
+        75.44,
+        77.24,
+        77.25,
+        77.62
+      ],
+      "val_acc": [
+        66.94,
+        70.68,
+        77.15,
+        79.83,
+        80.69,
+        81.8,
+        84.18,
+        84.98,
+        85.74,
+        86.05
+      ]
+    }
+  },
+  "final_classification_report": {
+    "Fresh Apple": {
+      "precision": 0.9250645994832042,
+      "recall": 0.9051833122629582,
+      "f1-score": 0.9150159744408944,
+      "support": 791.0
+    },
+    "Stale Apple": {
+      "precision": 0.8961038961038961,
+      "recall": 0.9078947368421053,
+      "f1-score": 0.9019607843137255,
+      "support": 988.0
+    },
+    "Fresh Banana": {
+      "precision": 0.9730033745781778,
+      "recall": 0.9697309417040358,
+      "f1-score": 0.9713644020213364,
+      "support": 892.0
+    },
+    "Stale Banana": {
+      "precision": 0.9911504424778761,
+      "recall": 0.9955555555555555,
+      "f1-score": 0.9933481152993349,
+      "support": 900.0
+    },
+    "Fresh Orange": {
+      "precision": 0.7982062780269058,
+      "recall": 0.9175257731958762,
+      "f1-score": 0.8537170263788968,
+      "support": 388.0
+    },
+    "Stale Orange": {
+      "precision": 0.9252873563218391,
+      "recall": 0.7990074441687345,
+      "f1-score": 0.8575233022636486,
+      "support": 403.0
+    },
+    "Fresh Cucumber": {
+      "precision": 0.5167785234899329,
+      "recall": 0.27598566308243727,
+      "f1-score": 0.3598130841121495,
+      "support": 279.0
+    },
+    "Stale Cucumber": {
+      "precision": 0.6547619047619048,
+      "recall": 0.43137254901960786,
+      "f1-score": 0.5200945626477541,
+      "support": 255.0
+    },
+    "Fresh Okra": {
+      "precision": 0.5358851674641149,
+      "recall": 0.9081081081081082,
+      "f1-score": 0.6740220661985957,
+      "support": 370.0
+    },
+    "Stale Okra": {
+      "precision": 0.653179190751445,
+      "recall": 0.5044642857142857,
+      "f1-score": 0.5692695214105794,
+      "support": 224.0
+    },
+    "Fresh Tomato": {
+      "precision": 0.9695817490494296,
+      "recall": 1.0,
+      "f1-score": 0.9845559845559846,
+      "support": 255.0
+    },
+    "Stale Tomato": {
+      "precision": 0.9915730337078652,
+      "recall": 1.0,
+      "f1-score": 0.995768688293371,
+      "support": 353.0
+    },
+    "accuracy": 0.8684814693342079,
+    "macro avg": {
+      "precision": 0.8192146263513828,
+      "recall": 0.801235697471142,
+      "f1-score": 0.7997044593280226,
+      "support": 6098.0
+    },
+    "weighted avg": {
+      "precision": 0.8712085548921502,
+      "recall": 0.8684814693342079,
+      "f1-score": 0.8633476487972542,
+      "support": 6098.0
+    }
+  },
+  "top_confusion_pairs": [
+    {
+      "true_class": "Fresh Cucumber",
+      "pred_class": "Fresh Okra",
+      "count": 177,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Stale Okra",
+      "pred_class": "Fresh Okra",
+      "count": 67,
+      "error_type": "Fresh/Stale Confusion"
+    },
+    {
+      "true_class": "Stale Orange",
+      "pred_class": "Stale Apple",
+      "count": 54,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Stale Cucumber",
+      "pred_class": "Stale Okra",
+      "count": 49,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Stale Cucumber",
+      "pred_class": "Fresh Okra",
+      "count": 47,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Stale Apple",
+      "pred_class": "Fresh Apple",
+      "count": 44,
+      "error_type": "Fresh/Stale Confusion"
+    },
+    {
+      "true_class": "Stale Cucumber",
+      "pred_class": "Fresh Cucumber",
+      "count": 42,
+      "error_type": "Fresh/Stale Confusion"
+    },
+    {
+      "true_class": "Fresh Apple",
+      "pred_class": "Fresh Orange",
+      "count": 36,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Stale Okra",
+      "pred_class": "Stale Cucumber",
+      "count": 35,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Fresh Apple",
+      "pred_class": "Stale Apple",
+      "count": 33,
+      "error_type": "Fresh/Stale Confusion"
+    },
+    {
+      "true_class": "Stale Apple",
+      "pred_class": "Fresh Orange",
+      "count": 29,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Fresh Okra",
+      "pred_class": "Fresh Cucumber",
+      "count": 22,
+      "error_type": "Cross-Produce Confusion"
+    },
+    {
+      "true_class": "Stale Orange",
+      "pred_class": "Fresh Orange",
+      "count": 20,
+      "error_type": "Fresh/Stale Confusion"
+    },
+    {
+      "true_class": "Fresh Cucumber",
+      "pred_class": "Stale Cucumber",
+      "count": 17,
+      "error_type": "Fresh/Stale Confusion"
+    },
+    {
+      "true_class": "Fresh Banana",
+      "pred_class": "Stale Apple",
+      "count": 12,
+      "error_type": "Cross-Produce Confusion"
+    }
+  ],
+  "total_test_samples": 6098,
+  "total_errors": 802,
+  "error_rate_percent": 13.15
+}

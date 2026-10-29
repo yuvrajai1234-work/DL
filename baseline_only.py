@@ -13,7 +13,7 @@ from PIL import Image
 warnings.filterwarnings("ignore")
 SEED=42; random.seed(SEED); np.random.seed(SEED); torch.manual_seed(SEED)
 
-BASE_DIR = r"c:\Users\yuvra\Downloads\archive"
+BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 TRAIN_DIR = os.path.join(BASE_DIR, "dataset", "Train")
 TEST_DIR  = os.path.join(BASE_DIR, "dataset", "Test")
 OUT       = os.path.join(BASE_DIR, "outputs")

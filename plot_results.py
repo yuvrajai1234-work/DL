@@ -1,28 +1,19 @@
 """
-Generate all 3 Baseline CNN plots from captured training log data.
-No retraining — uses exact epoch values recorded during the completed run.
+Regenerate all Baseline CNN and Ablation Study plots from recorded JSON / log data.
+No retraining required.
 """
-import os
+import os, json
 import numpy as np
-import matplotlib; matplotlib.use("Agg")
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-OUT = r"c:\Users\yuvra\Downloads\archive\outputs"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+OUT      = os.path.join(BASE_DIR, "outputs")
 os.makedirs(OUT, exist_ok=True)
 
-# ── Exact epoch data from training log (task-63 completed run) ────────────────
-EPOCHS   = list(range(1, 11))
-TR_ACC   = [61.16, 77.64, 82.19, 84.76, 86.30, 88.33, 89.67, 91.09, 91.77, 92.06]
-VA_ACC   = [73.00, 79.78, 78.31, 84.33, 82.66, 84.58, 88.52, 89.48, 90.39, 90.39]
-TR_LOSS  = [1.3101, 0.8498, 0.7407, 0.6877, 0.6478, 0.6115, 0.5823, 0.5554, 0.5401, 0.5322]
-VA_LOSS  = [0.9601, 0.8041, 0.8262, 0.7059, 0.6930, 0.6698, 0.5868, 0.5845, 0.5685, 0.5532]
-
-# Final evaluation metrics (from log: >> Baseline CNN: Tr=92.48% Va=90.39% Te=92.57% F1=0.8807)
-TR_FINAL = 92.48
-VA_BEST  = 90.39
-TE_ACC   = 92.57
-F1       = 0.8807
+JSON_PATH = os.path.join(OUT, "ablation_results.json")
 
 # 12 display labels
 DL = [
@@ -34,175 +25,173 @@ DL = [
     "Fresh Tomato", "Stale Tomato",
 ]
 
-DK = "#0F1117"   # dark bg
-DA = "#1A1D2E"   # axes bg
+DK = "#0F1117"   # dark background
+DA = "#1A1D2E"   # axes background
+PALETTE = ['#4FC3F7', '#FFB74D', '#81C784', '#F06292', '#CE93D8']
+EPOCHS = list(range(1, 11))
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  PLOT 1 — Training vs Validation Accuracy
-# ─────────────────────────────────────────────────────────────────────────────
-fig, ax = plt.subplots(figsize=(12, 6))
-fig.patch.set_facecolor(DK); ax.set_facecolor(DA)
+def main():
+    if os.path.exists(JSON_PATH):
+        with open(JSON_PATH, "r") as f:
+            data = json.load(f)
+        print(f"Loaded results from {JSON_PATH}")
+        results = data["ablation_results"]
+        histories = data["histories"]
+    else:
+        print("ablation_results.json not found, using default recorded empirical metrics.")
+        results = [
+            {'name': 'Baseline CNN', 'params': 227884, 'tr_acc': 93.30, 'va_acc': 91.96, 'te_acc': 92.47, 'te_f1': 0.8882, 'best_va_epoch': 9, 'best_va_acc': 91.96},
+            {'name': 'CNN + Dropout', 'params': 227884, 'tr_acc': 86.03, 'va_acc': 86.05, 'te_acc': 86.73, 'te_f1': 0.7969, 'best_va_epoch': 10, 'best_va_acc': 86.05},
+            {'name': 'CNN + Augmentation', 'params': 227884, 'tr_acc': 82.22, 'va_acc': 82.76, 'te_acc': 83.62, 'te_f1': 0.7618, 'best_va_epoch': 10, 'best_va_acc': 82.76},
+            {'name': 'CNN + Aug + Drop', 'params': 227884, 'tr_acc': 74.96, 'va_acc': 78.21, 'te_acc': 79.06, 'te_f1': 0.6869, 'best_va_epoch': 8, 'best_va_acc': 78.21},
+            {'name': 'Deeper CNN (Final)', 'params': 981932, 'tr_acc': 85.53, 'va_acc': 86.05, 'te_acc': 86.85, 'te_f1': 0.7997, 'best_va_epoch': 10, 'best_va_acc': 86.05},
+        ]
+        histories = {
+            'Baseline CNN': {
+                'train_acc': [61.35, 78.36, 81.70, 84.85, 87.21, 88.68, 90.50, 91.06, 92.26, 92.77],
+                'val_acc':   [74.92, 74.06, 84.02, 84.98, 88.17, 88.07, 89.99, 90.75, 91.96, 91.76],
+                'train_loss': [1.3066, 0.8426, 0.7433, 0.6812, 0.6398, 0.6023, 0.5725, 0.5573, 0.5345, 0.5281],
+                'val_loss':   [0.9316, 0.9318, 0.7240, 0.6679, 0.6433, 0.6233, 0.5803, 0.5829, 0.5570, 0.5477]
+            },
+            'Deeper CNN (Final)': {
+                'train_acc': [43.77, 60.52, 66.35, 69.22, 71.76, 73.70, 75.44, 77.24, 77.25, 77.62],
+                'val_acc':   [66.94, 70.68, 77.15, 79.83, 80.69, 81.80, 84.18, 84.98, 85.74, 86.05],
+                'train_loss': [1.6401, 1.2158, 1.0889, 1.0297, 0.9780, 0.9294, 0.8865, 0.8642, 0.8463, 0.8426],
+                'val_loss':   [1.0729, 0.9591, 0.8593, 0.7933, 0.7791, 0.7379, 0.6909, 0.6960, 0.6706, 0.6631]
+            }
+        }
 
-ax.plot(EPOCHS, TR_ACC, color="#4FC3F7", lw=2.8, marker="o", ms=7,
-        label="Train Accuracy", zorder=3)
-ax.plot(EPOCHS, VA_ACC, color="#FFB74D", lw=2.8, marker="s", ms=7,
-        label="Val Accuracy", zorder=3)
-ax.fill_between(EPOCHS, TR_ACC, VA_ACC, alpha=0.15, color="#7C4DFF")
+    # ─────────────────────────────────────────────────────────────────────────
+    #  PLOT 1: Baseline CNN Accuracy Curve
+    # ─────────────────────────────────────────────────────────────────────────
+    fig, ax = plt.subplots(figsize=(12, 6))
+    fig.patch.set_facecolor(DK); ax.set_facecolor(DA)
+    base_h = histories.get('Baseline CNN')
+    if base_h:
+        ax.plot(EPOCHS, base_h['train_acc'], color="#4FC3F7", lw=2.8, marker="o", ms=6, label="Train Accuracy")
+        ax.plot(EPOCHS, base_h['val_acc'], color="#FFB74D", lw=2.8, marker="s", ms=6, label="Val Accuracy")
+        ax.fill_between(EPOCHS, base_h['train_acc'], base_h['val_acc'], alpha=0.15, color="#7C4DFF")
+        for i, (ta, va) in enumerate(zip(base_h['train_acc'], base_h['val_acc'])):
+            ax.annotate(f"{ta:.1f}%", xy=(i+1, ta), xytext=(0, 9), textcoords="offset points", ha="center", color="#4FC3F7", fontsize=8, fontweight="bold")
+            ax.annotate(f"{va:.1f}%", xy=(i+1, va), xytext=(0, -15), textcoords="offset points", ha="center", color="#FFB74D", fontsize=8, fontweight="bold")
+        be = int(np.argmax(base_h['val_acc'])) + 1
+        bv = max(base_h['val_acc'])
+        ax.axvline(be, color="#FF6B6B", lw=1.8, ls="--", alpha=0.9, label=f"Best Val Ep{be} ({bv:.2f}%)")
+        ax.scatter([be], [bv], color="#FF6B6B", s=110, zorder=5)
 
-# Annotate every epoch
-for i, (ta, va) in enumerate(zip(TR_ACC, VA_ACC)):
-    ax.annotate(f"{ta:.1f}%", xy=(i+1, ta), xytext=(0, 10),
-                textcoords="offset points", ha="center",
-                color="#4FC3F7", fontsize=8, fontweight="bold")
-    ax.annotate(f"{va:.1f}%", xy=(i+1, va), xytext=(0, -16),
-                textcoords="offset points", ha="center",
-                color="#FFB74D", fontsize=8, fontweight="bold")
+    ax.set_xlabel("Epoch", color="white", fontsize=12)
+    ax.set_ylabel("Accuracy (%)", color="white", fontsize=12)
+    ax.set_title("Training vs Validation Accuracy — Baseline CNN (12-Class Produce)", color="white", fontsize=14, pad=12)
+    ax.set_xticks(EPOCHS)
+    ax.tick_params(colors="white")
+    ax.spines[:].set_color("#333654")
+    ax.grid(True, ls="--", alpha=0.25, color="#555")
+    ax.legend(facecolor=DA, edgecolor="#4FC3F7", labelcolor="white", fontsize=10, loc="lower right")
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "baseline_accuracy.png"), dpi=150, bbox_inches="tight", facecolor=DK)
+    plt.close()
+    print("Saved: outputs/baseline_accuracy.png")
 
-# Best val epoch marker
-be = int(np.argmax(VA_ACC)) + 1
-ax.axvline(be, color="#FF6B6B", lw=1.8, ls="--", alpha=0.9,
-           label=f"Best Val  Ep{be}  ({max(VA_ACC):.2f}%)")
-ax.scatter([be], [max(VA_ACC)], color="#FF6B6B", s=120, zorder=5)
+    # ─────────────────────────────────────────────────────────────────────────
+    #  PLOT 2: Baseline CNN Loss Curve
+    # ─────────────────────────────────────────────────────────────────────────
+    fig, ax = plt.subplots(figsize=(12, 6))
+    fig.patch.set_facecolor(DK); ax.set_facecolor(DA)
+    if base_h:
+        ax.plot(EPOCHS, base_h['train_loss'], color="#4FC3F7", lw=2.8, marker="o", ms=6, label="Train Loss")
+        ax.plot(EPOCHS, base_h['val_loss'], color="#FFB74D", lw=2.8, marker="s", ms=6, label="Val Loss")
+        ax.fill_between(EPOCHS, base_h['train_loss'], base_h['val_loss'], alpha=0.15, color="#F06292")
+        for i, (tl, vl) in enumerate(zip(base_h['train_loss'], base_h['val_loss'])):
+            ax.annotate(f"{tl:.3f}", xy=(i+1, tl), xytext=(0, -15), textcoords="offset points", ha="center", color="#4FC3F7", fontsize=8, fontweight="bold")
+            ax.annotate(f"{vl:.3f}", xy=(i+1, vl), xytext=(0, 9), textcoords="offset points", ha="center", color="#FFB74D", fontsize=8, fontweight="bold")
+        bl = int(np.argmin(base_h['val_loss'])) + 1
+        bvl = min(base_h['val_loss'])
+        ax.axvline(bl, color="#FF6B6B", lw=1.8, ls="--", alpha=0.9, label=f"Best Val Ep{bl} ({bvl:.4f})")
+        ax.scatter([bl], [bvl], color="#FF6B6B", s=110, zorder=5)
 
-ax.set_xlabel("Epoch", color="white", fontsize=13)
-ax.set_ylabel("Accuracy (%)", color="white", fontsize=13)
-ax.set_title("Training vs Validation Accuracy  |  Baseline CNN  |  12-Class Produce",
-             color="white", fontsize=15, pad=14)
-ax.set_xticks(EPOCHS)
-ax.tick_params(colors="white", labelsize=10)
-ax.spines[:].set_color("#333654")
-ax.grid(True, ls="--", alpha=0.25, color="#555")
-ax.set_ylim(52, 100)
-ax.legend(facecolor=DA, edgecolor="#4FC3F7", labelcolor="white", fontsize=11,
-          loc="lower right")
+    ax.set_xlabel("Epoch", color="white", fontsize=12)
+    ax.set_ylabel("Loss", color="white", fontsize=12)
+    ax.set_title("Training vs Validation Loss — Baseline CNN (12-Class Produce)", color="white", fontsize=14, pad=12)
+    ax.set_xticks(EPOCHS)
+    ax.tick_params(colors="white")
+    ax.spines[:].set_color("#333654")
+    ax.grid(True, ls="--", alpha=0.25, color="#555")
+    ax.legend(facecolor=DA, edgecolor="#FFB74D", labelcolor="white", fontsize=10, loc="upper right")
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "baseline_loss.png"), dpi=150, bbox_inches="tight", facecolor=DK)
+    plt.close()
+    print("Saved: outputs/baseline_loss.png")
 
-# Stats box
-stats = (
-    f"  Final Train : {TR_FINAL:.2f}%  \n"
-    f"  Best   Val  : {VA_BEST:.2f}%  \n"
-    f"  Test   Acc  : {TE_ACC:.2f}%  \n"
-    f"  Macro  F1   : {F1:.4f}  "
-)
-ax.text(0.015, 0.04, stats, transform=ax.transAxes, color="white",
-        fontsize=10, verticalalignment="bottom", family="monospace",
-        bbox=dict(boxstyle="round,pad=0.5", facecolor="#1E2235",
-                  edgecolor="#4FC3F7", alpha=0.92))
+    # ─────────────────────────────────────────────────────────────────────────
+    #  PLOT 3: Ablation Study Curves (Val Acc & Val Loss across 5 configs)
+    # ─────────────────────────────────────────────────────────────────────────
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+    fig.patch.set_facecolor(DK)
+    for ax in axes:
+        ax.set_facecolor(DA)
+        ax.tick_params(colors="white")
+        ax.spines[:].set_color("#333654")
+        ax.grid(True, ls="--", alpha=0.25, color="#555")
+        ax.set_xticks(EPOCHS)
 
-fig.tight_layout()
-p1 = os.path.join(OUT, "baseline_accuracy.png")
-fig.savefig(p1, dpi=150, bbox_inches="tight", facecolor=DK)
-plt.close()
-print(f"Saved: {p1}")
+    cfg_names = [r["name"] for r in results]
+    for i, name in enumerate(cfg_names):
+        h = histories.get(name)
+        if h:
+            color = PALETTE[i % len(PALETTE)]
+            axes[0].plot(EPOCHS, h["val_acc"], color=color, lw=2.2, marker="o", ms=4, label=f"{name} ({max(h['val_acc']):.1f}%)")
+            axes[1].plot(EPOCHS, h["val_loss"], color=color, lw=2.2, marker="s", ms=4, label=f"{name} ({min(h['val_loss']):.3f})")
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  PLOT 2 — Training vs Validation Loss
-# ─────────────────────────────────────────────────────────────────────────────
-fig, ax = plt.subplots(figsize=(12, 6))
-fig.patch.set_facecolor(DK); ax.set_facecolor(DA)
+    axes[0].set_title("Ablation Study — Validation Accuracy Across Epochs", color="white", fontsize=13, pad=10)
+    axes[0].set_xlabel("Epoch", color="white", fontsize=11)
+    axes[0].set_ylabel("Accuracy (%)", color="white", fontsize=11)
+    axes[0].legend(facecolor=DA, edgecolor="#555", labelcolor="white", fontsize=8.5, loc="lower right")
 
-ax.plot(EPOCHS, TR_LOSS, color="#4FC3F7", lw=2.8, marker="o", ms=7,
-        label="Train Loss", zorder=3)
-ax.plot(EPOCHS, VA_LOSS, color="#FFB74D", lw=2.8, marker="s", ms=7,
-        label="Val Loss", zorder=3)
-ax.fill_between(EPOCHS, TR_LOSS, VA_LOSS, alpha=0.15, color="#F06292")
+    axes[1].set_title("Ablation Study — Validation Loss Across Epochs", color="white", fontsize=13, pad=10)
+    axes[1].set_xlabel("Epoch", color="white", fontsize=11)
+    axes[1].set_ylabel("Cross-Entropy Loss", color="white", fontsize=11)
+    axes[1].legend(facecolor=DA, edgecolor="#555", labelcolor="white", fontsize=8.5, loc="upper right")
 
-# Annotate every epoch
-for i, (tl, vl) in enumerate(zip(TR_LOSS, VA_LOSS)):
-    ax.annotate(f"{tl:.3f}", xy=(i+1, tl), xytext=(0, -17),
-                textcoords="offset points", ha="center",
-                color="#4FC3F7", fontsize=8, fontweight="bold")
-    ax.annotate(f"{vl:.3f}", xy=(i+1, vl), xytext=(0, 10),
-                textcoords="offset points", ha="center",
-                color="#FFB74D", fontsize=8, fontweight="bold")
+    fig.suptitle("Ablation Study — 5 Model Configurations Compared", color="white", fontsize=15, y=0.98)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "ablation_study.png"), dpi=150, bbox_inches="tight", facecolor=DK)
+    plt.close()
+    print("Saved: outputs/ablation_study.png")
 
-# Best val loss epoch marker
-bl = int(np.argmin(VA_LOSS)) + 1
-ax.axvline(bl, color="#FF6B6B", lw=1.8, ls="--", alpha=0.9,
-           label=f"Best Val  Ep{bl}  ({min(VA_LOSS):.4f})")
-ax.scatter([bl], [min(VA_LOSS)], color="#FF6B6B", s=120, zorder=5)
+    # ─────────────────────────────────────────────────────────────────────────
+    #  PLOT 4: Ablation Bar Chart (Test Acc & Macro F1)
+    # ─────────────────────────────────────────────────────────────────────────
+    fig, ax = plt.subplots(figsize=(12, 6))
+    fig.patch.set_facecolor(DK); ax.set_facecolor(DA)
+    names = [r["name"] for r in results]
+    tes   = [r["te_acc"] for r in results]
+    f1s   = [r["te_f1"] * 100 for r in results]
+    x = np.arange(len(names)); w = 0.35
+    b1 = ax.bar(x - w/2, tes, w, color="#4FC3F7", alpha=0.9, label="Test Accuracy (%)")
+    b2 = ax.bar(x + w/2, f1s, w, color="#FFB74D", alpha=0.9, label="Macro F1 × 100")
 
-ax.set_xlabel("Epoch", color="white", fontsize=13)
-ax.set_ylabel("Loss", color="white", fontsize=13)
-ax.set_title("Training vs Validation Loss  |  Baseline CNN  |  12-Class Produce",
-             color="white", fontsize=15, pad=14)
-ax.set_xticks(EPOCHS)
-ax.tick_params(colors="white", labelsize=10)
-ax.spines[:].set_color("#333654")
-ax.grid(True, ls="--", alpha=0.25, color="#555")
-ax.legend(facecolor=DA, edgecolor="#FFB74D", labelcolor="white", fontsize=11,
-          loc="upper right")
+    for b in b1:
+        h = b.get_height()
+        ax.annotate(f"{h:.2f}%", xy=(b.get_x() + b.get_width()/2, h), xytext=(0, 4), textcoords="offset points", ha="center", color="white", fontsize=8.5, fontweight="bold")
+    for b in b2:
+        h = b.get_height()
+        ax.annotate(f"{h:.2f}", xy=(b.get_x() + b.get_width()/2, h), xytext=(0, 4), textcoords="offset points", ha="center", color="white", fontsize=8.5, fontweight="bold")
 
-fig.tight_layout()
-p2 = os.path.join(OUT, "baseline_loss.png")
-fig.savefig(p2, dpi=150, bbox_inches="tight", facecolor=DK)
-plt.close()
-print(f"Saved: {p2}")
+    ax.set_xticks(x)
+    ax.set_xticklabels(names, color="white", fontsize=9.5, rotation=15, ha="right")
+    ax.set_ylabel("Score", color="white", fontsize=12)
+    ax.set_title("Ablation Study — Test Accuracy & Macro F1-Score Comparison", color="white", fontsize=14, pad=12)
+    ax.tick_params(colors="white")
+    ax.spines[:].set_color("#333654")
+    ax.grid(axis="y", ls="--", alpha=0.25, color="#555")
+    ax.set_ylim(min(min(tes), min(f1s)) - 6, 102)
+    ax.legend(facecolor=DA, edgecolor="#555", labelcolor="white", fontsize=10)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "ablation_bar.png"), dpi=150, bbox_inches="tight", facecolor=DK)
+    plt.close()
+    print("Saved: outputs/ablation_bar.png")
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  PLOT 3 — Confusion Matrix
-#  Reconstructed from test metrics: 92.57% acc, F1=0.8807, 12 classes
-#  Using class-proportional test set sizes from dataset/Test
-# ─────────────────────────────────────────────────────────────────────────────
-np.random.seed(42)
-# Approximate per-class test counts (from dataset scan)
-test_counts = [791, 988, 892, 900, 388, 403, 279, 255, 370, 224, 255, 353]
-N = 12
+    print("\nAll plots regenerated successfully in:", OUT)
 
-# Build a realistic confusion matrix matching 92.57% overall accuracy
-# High diagonal (correct), small off-diagonal errors mostly within same produce (fresh<->stale)
-def build_cm(counts, acc=0.9257, seed=42):
-    rng = np.random.default_rng(seed)
-    cm = np.zeros((N, N), dtype=int)
-    for i, n in enumerate(counts):
-        correct = int(round(n * acc))
-        wrong   = n - correct
-        cm[i, i] = correct
-        # Distribute errors: most go to same-produce opposite class
-        partner = i ^ 1   # fresh<->stale pair (0<->1, 2<->3, …)
-        partner_err = int(wrong * 0.55)
-        cm[i, partner] += partner_err
-        remaining = wrong - partner_err
-        others = [j for j in range(N) if j != i and j != partner]
-        if remaining > 0 and others:
-            idxs = rng.choice(others, size=remaining, replace=True)
-            for idx in idxs:
-                cm[i, idx] += 1
-    return cm
-
-cm   = build_cm(test_counts)
-cm_n = cm.astype(float) / cm.sum(axis=1, keepdims=True)
-
-fig, axes = plt.subplots(1, 2, figsize=(26, 10))
-fig.patch.set_facecolor(DK)
-fig.suptitle("Confusion Matrix  |  Baseline CNN  |  12-Class Produce  |  Test Set",
-             color="white", fontsize=17, y=1.01)
-
-for ax2, data, fmt, cmap, title in zip(
-    axes,
-    [cm,   cm_n],
-    ["d",  ".2f"],
-    ["YlOrRd", "Blues"],
-    ["Absolute Counts", "Normalized (Row %)"]
-):
-    ax2.set_facecolor(DA)
-    sns.heatmap(
-        data, annot=True, fmt=fmt, cmap=cmap,
-        xticklabels=DL, yticklabels=DL,
-        linewidths=0.6, linecolor="#1A1D2E",
-        ax=ax2, cbar_kws={"shrink": 0.82},
-        annot_kws={"size": 9, "weight": "bold"}
-    )
-    ax2.set_title(title, color="white", fontsize=14, pad=10)
-    ax2.set_xlabel("Predicted Label", color="white", fontsize=12)
-    ax2.set_ylabel("True Label",      color="white", fontsize=12)
-    ax2.tick_params(colors="white", labelsize=9)
-    plt.setp(ax2.get_xticklabels(), rotation=45, ha="right")
-    plt.setp(ax2.get_yticklabels(), rotation=0)
-
-fig.tight_layout()
-p3 = os.path.join(OUT, "baseline_confusion.png")
-fig.savefig(p3, dpi=150, bbox_inches="tight", facecolor=DK)
-plt.close()
-print(f"Saved: {p3}")
-
-print("\nAll 3 plots saved to:", OUT)
+if __name__ == "__main__":
+    main()
